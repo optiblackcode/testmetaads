@@ -23,12 +23,12 @@ if env_file:
 log_file = "streamlit_log.log"
 logging.basicConfig(level=logging.INFO, format='%(asctime)s %(levelname)s %(message)s')
 
-# Facebook API Config (with fallback to environment variables)
-FACEBOOK_CLIENT_ID = os.getenv("FACEBOOK_CLIENT_ID", "2027482614409461")
-FACEBOOK_CLIENT_SECRET = os.getenv("FACEBOOK_CLIENT_SECRET", "9bbce310eb49539553a04372aac587ba")
-FACEBOOK_AD_ACCOUNT_ID = os.getenv("FACEBOOK_AD_ACCOUNT_ID", "346957677")
-FACEBOOK_ACCESS_TOKEN = os.getenv("FACEBOOK_ACCESS_TOKEN", "EAAKIqv3YpaQBO6rIpYtihXatzGu0ainUPRsOQXFfaLBT2349Hp0SnRYdbnWMl2ZBTgwW3EwnBnYeDFth9unsacb78mt2ZC9NpTkGGXj9WwGmqEZAlNh8TOOPAchfnRBoj8ZBrULOxKgxYlAnyMemb2MPeJGKetuXAQaxxxpKDxGuKZC2MN8ZB5bGaiO67c")
-FACEBOOK_API_VERSION = "v17.0"
+# Facebook API Config (loaded from .env file)
+FACEBOOK_CLIENT_ID = os.getenv("FACEBOOK_CLIENT_ID")
+FACEBOOK_CLIENT_SECRET = os.getenv("FACEBOOK_CLIENT_SECRET")
+FACEBOOK_AD_ACCOUNT_ID = os.getenv("FACEBOOK_AD_ACCOUNT_ID")
+FACEBOOK_ACCESS_TOKEN = os.getenv("FACEBOOK_ACCESS_TOKEN")
+FACEBOOK_API_VERSION = os.getenv("FACEBOOK_API_VERSION", "v17.0")  # Default to v17.0 if not specified in .env
 
 def generate_appsecret_proof(access_token: str, app_secret: str) -> str:
     return hmac.new(
