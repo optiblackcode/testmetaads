@@ -8,20 +8,28 @@ from datetime import datetime, timedelta
 from dotenv import load_dotenv
 import logging
 
-# Load environment variables from .env file
-load_dotenv()
+# Streamlit File Upload for .env
+st.title("Meta Ads Campaign Insights")
 
-# Set environment variables
+env_file = st.file_uploader("Upload .env file", type="env")
+
+if env_file:
+    with open(".env", "wb") as f:
+        f.write(env_file.getbuffer())
+    load_dotenv()  # Reload the .env file after upload
+    st.success(".env file loaded successfully")
+
+# Set up logging
+log_file = "streamlit_log.log"
+logging.basicConfig(level=logging.INFO, format='%(asctime)s %(levelname)s %(message)s')
+
+# Facebook API Config (with fallback to environment variables)
 FACEBOOK_CLIENT_ID = os.getenv("FACEBOOK_CLIENT_ID", "2027482614409461")
 FACEBOOK_CLIENT_SECRET = os.getenv("FACEBOOK_CLIENT_SECRET", "9bbce310eb49539553a04372aac587ba")
 FACEBOOK_AD_ACCOUNT_ID = os.getenv("FACEBOOK_AD_ACCOUNT_ID", "346957677")
 FACEBOOK_ACCESS_TOKEN = os.getenv("FACEBOOK_ACCESS_TOKEN", "EAAKIqv3YpaQBO6rIpYtihXatzGu0ainUPRsOQXFfaLBT2349Hp0SnRYdbnWMl2ZBTgwW3EwnBnYeDFth9unsacb78mt2ZC9NpTkGGXj9WwGmqEZAlNh8TOOPAchfnRBoj8ZBrULOxKgxYlAnyMemb2MPeJGKetuXAQaxxxpKDxGuKZC2MN8ZB5bGaiO67c")
 FACEBOOK_API_VERSION = "v17.0"
 
-# Set up logging
-logging.basicConfig(level=logging.INFO, format='%(asctime)s %(levelname)s %(message)s')
-
-# Function Definitions (same as in your code)
 def generate_appsecret_proof(access_token: str, app_secret: str) -> str:
     return hmac.new(
         app_secret.encode('utf-8'),
@@ -29,6 +37,7 @@ def generate_appsecret_proof(access_token: str, app_secret: str) -> str:
         hashlib.sha256
     ).hexdigest()
 
+# Async Functions
 async def debug_token(access_token: str) -> dict:
     endpoint = "debug_token"
     params = {
@@ -161,9 +170,6 @@ def fetch_meta_ads_data(start_date, end_date):
     return asyncio.run(async_fetch_campaigns(start_date, end_date, access_token))
 
 
-# Streamlit App Code to Display the Data
-st.title("Meta Ads Campaign Insights")
-
 # Date range input
 start_date = st.date_input("Start Date", datetime(2023, 1, 1))
 end_date = st.date_input("End Date", datetime(2023, 12, 31))
@@ -180,11 +186,12 @@ if st.button("Fetch Data"):
     except Exception as e:
         st.error(f"Error: {e}")
 
-# Show logs
+# Show logs (handle missing log file)
 st.subheader("Logs")
-log_file = "streamlit_log.log"
-
-with open(log_file, "r") as file:
-    logs = file.readlines()
-    for line in logs[-10:]:
-        st.text(line)
+if os.path.exists(log_file):
+    with open(log_file, "r") as file:
+        logs = file.readlines()
+        for line in logs[-10:]:
+            st.text(line)
+else:
+    st.warning("Log file not found. No logs to display.")
