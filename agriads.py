@@ -1,4 +1,5 @@
 import streamlit as st
+import os  # Ensure os module is imported
 import asyncio
 import httpx
 import hashlib
